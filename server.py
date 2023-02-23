@@ -21,6 +21,9 @@ def get_user(user_id: int, session: Session):
     user = session.query(User).get(user_id)
     if user is None:
         raise HttpError(404, 'user not found')
+    return user
+
+
 
 class UserView(MethodView):
 
@@ -53,10 +56,22 @@ class UserView(MethodView):
             )
 
     def patch(self, user_id: int):
-        pass
+        json_data = request.json
+        with Session() as session:
+            user = get_user(user_id, session)
+            for field, value in json_data.items():
+                setattr(user, field, value)
+            session.add(user)
+            session.commit()
+        return jsonify({'status': 'succes'})
 
     def delete(self, user_id: int):
-        pass
+        with Session() as session:
+            user = get_user(user_id, session)
+            session.delete(user)
+            session.commit()
+        return jsonify({'status': 'succes'})
+
 
 app.add_url_rule('/users/<int:user_id>', view_func=UserView.as_view('users_witg_id'), methods=['GET', 'PATCH', 'DELETE'])
 app.add_url_rule('/users', view_func=UserView.as_view('users'), methods=['POST'])
