@@ -19,6 +19,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False, unique=True, index=True)
     password = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
     creation_time = Column(DateTime, server_default=func.now())
 
 
